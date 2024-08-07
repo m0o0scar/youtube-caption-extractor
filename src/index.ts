@@ -13,7 +13,7 @@ interface CaptionTrack {
 }
 
 export interface Options {
-  videoID: string;
+  videoID?: string;
   lang?: string;
   pageHtml?: string;
   captionDownloadUrl?: string;
@@ -29,6 +29,10 @@ const getCaptionDownloadUrl = async ({
 
   let html = pageHtml;
   if (!html) {
+    if (!videoID) {
+      console.warn('No video ID provided');
+      return null;
+    }
     const response = await fetch(`https://m.youtube.com/watch?v=${videoID}`);
     html = await response.text();
   }
