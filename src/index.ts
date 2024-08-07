@@ -44,7 +44,7 @@ const getCaptionDownloadUrl = async ({
   }
 
   // Extract caption tracks JSON string from video page data
-  const regex = /"captionTracks":(\[.*?\])/;
+  const regex = /"captionTracks":\s*?(\[.*?\])/;
   const regexResult = regex.exec(html);
 
   if (!regexResult) {
