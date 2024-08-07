@@ -44,7 +44,7 @@ const getCaptionDownloadUrl = async ({
   }
 
   // Extract caption tracks JSON string from video page data
-  const regex = /"captionTracks":\s*?(\[.*?\])/;
+  const regex = /"captionTracks":\s*?((\[.*?\]),)/;
   const regexResult = regex.exec(html);
 
   if (!regexResult) {
@@ -52,7 +52,7 @@ const getCaptionDownloadUrl = async ({
     return null;
   }
 
-  const [_, captionTracksJson] = regexResult;
+  const [_, _match, captionTracksJson] = regexResult;
   const captionTracks = JSON.parse(captionTracksJson);
 
   // Find the appropriate subtitle language track
