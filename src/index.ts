@@ -15,6 +15,7 @@ interface CaptionTrack {
 export interface Options {
   videoID: string;
   lang?: string;
+  proxy?: (youtubePageUrl: string) => string;
 }
 
 export interface VideoDetails {
@@ -23,12 +24,24 @@ export interface VideoDetails {
   subtitles: Subtitle[];
 }
 
+const getYouTubePageHTML = async ({ videoID, proxy }: Options) => {
+  // Prepare request url
+  const pageUrl = `https://youtube.com/watch?v=${videoID}`;
+  const requestUrl = proxy?.(pageUrl) || pageUrl;
+  if (!requestUrl) throw new Error(`Proxy function didn't return a valid url`);
+
+  const response = await fetch(requestUrl);
+  const html = await response.text();
+
+  return html;
+};
+
 export const getVideoDetails = async ({
   videoID,
   lang = 'en',
+  proxy,
 }: Options): Promise<VideoDetails> => {
-  const response = await fetch(`https://youtube.com/watch?v=${videoID}`);
-  const data = await response.text();
+  const data = await getYouTubePageHTML({ videoID, proxy });
 
   // Extract title and description from the page data
   const titleMatch = data.match(
@@ -142,10 +155,9 @@ export const getVideoDetails = async ({
 export const getSubtitles = async ({
   videoID,
   lang = 'en',
+  proxy,
 }: Options): Promise<Subtitle[]> => {
-  // Fetch YouTube video page data
-  const response = await fetch(`https://youtube.com/watch?v=${videoID}`);
-  const data = await response.text();
+  const data = await getYouTubePageHTML({ videoID, proxy });
 
   // Check if the video page contains captions
   if (!data.includes('captionTracks')) {
