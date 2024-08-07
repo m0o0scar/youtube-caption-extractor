@@ -1,6 +1,6 @@
 {
   "name": "@treeee/youtube-caption-extractor",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "A simple and efficient package to scrape and parse captions (subtitles) from YouTube videos, supporting both user-submitted and auto-generated captions with language options.",
   "main": "dist/index.js",
   "scripts": {
