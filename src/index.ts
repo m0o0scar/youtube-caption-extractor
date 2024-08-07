@@ -15,6 +15,7 @@ interface CaptionTrack {
 export interface Options {
   videoID: string;
   lang?: string;
+  pageHtml?: string;
   proxy?: (youtubePageUrl: string) => string;
 }
 
@@ -24,9 +25,11 @@ export interface VideoDetails {
   subtitles: Subtitle[];
 }
 
-const getYouTubePageHTML = async ({ videoID, proxy }: Options) => {
+const getYouTubePageHTML = async ({ videoID, pageHtml, proxy }: Options) => {
+  if (pageHtml) return pageHtml;
+
   // Prepare request url
-  const pageUrl = `https://youtube.com/watch?v=${videoID}`;
+  const pageUrl = `https://m.youtube.com/watch?v=${videoID}`;
   const requestUrl = proxy?.(pageUrl) || pageUrl;
   if (!requestUrl) throw new Error(`Proxy function didn't return a valid url`);
 
@@ -36,12 +39,12 @@ const getYouTubePageHTML = async ({ videoID, proxy }: Options) => {
   return html;
 };
 
-export const getVideoDetails = async ({
-  videoID,
-  lang = 'en',
-  proxy,
-}: Options): Promise<VideoDetails> => {
-  const data = await getYouTubePageHTML({ videoID, proxy });
+export const getVideoDetails = async (
+  options: Options
+): Promise<VideoDetails> => {
+  const { videoID, lang = 'en' } = options;
+
+  const data = await getYouTubePageHTML(options);
 
   // Extract title and description from the page data
   const titleMatch = data.match(
@@ -152,12 +155,10 @@ export const getVideoDetails = async ({
   };
 };
 
-export const getSubtitles = async ({
-  videoID,
-  lang = 'en',
-  proxy,
-}: Options): Promise<Subtitle[]> => {
-  const data = await getYouTubePageHTML({ videoID, proxy });
+export const getSubtitles = async (options: Options): Promise<Subtitle[]> => {
+  const { videoID, lang = 'en' } = options;
+
+  const data = await getYouTubePageHTML(options);
 
   // Check if the video page contains captions
   if (!data.includes('captionTracks')) {
